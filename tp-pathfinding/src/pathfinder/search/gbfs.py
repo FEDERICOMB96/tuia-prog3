@@ -6,6 +6,21 @@ from ..models.node import Node
 
 class GreedyBestFirstSearch:
     @staticmethod
+    def manhattan_distance(node: Node) -> int:
+        """Heuristic function for Greedy Best First Search
+
+        Args:
+            node (Node): Node to evaluate
+
+        Returns:
+            int: Heuristic value
+        """
+        if node.parent is None:
+            return 0
+        
+        return abs(node.state[0] - node.parent.state[0]) + abs(node.state[1] - node.parent.state[1])
+    
+    @staticmethod
     def search(grid: Grid) -> Solution:
         """Find path between two points in a grid using Greedy Best First Search
 
@@ -22,6 +37,33 @@ class GreedyBestFirstSearch:
         explored = {} 
         
         # Add the node to the explored dictionary
-        explored[node.state] = True
+        explored[node.state] = node.cost
         
-        return NoSolution(explored)
+        frontier = PriorityQueueFrontier()
+        frontier.add(node, GreedyBestFirstSearch.manhattan_distance(node))
+
+        while True:
+
+            if frontier.is_empty():
+                return NoSolution(explored)
+            
+            node = frontier.pop()
+            if node.state == grid.end:
+                return Solution(node, explored)
+            
+            successors = grid.get_neighbours(node.state) #{a1:s1, a2:s2,...}
+            acciones = successors.keys()
+            
+            for action in acciones:
+                new_state = successors[action]
+                cost = node.cost + grid.get_cost(new_state)
+
+                if new_state not in explored or cost < explored[new_state]:
+                    new_node = Node("", 
+                                    new_state,
+                                    cost,
+                                    node,
+                                    action)
+                    
+                    explored[new_state] = cost
+                    frontier.add(new_node, GreedyBestFirstSearch.manhattan_distance(new_node))

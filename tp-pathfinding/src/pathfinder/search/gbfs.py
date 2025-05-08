@@ -6,7 +6,7 @@ from ..models.node import Node
 
 class GreedyBestFirstSearch:
     @staticmethod
-    def manhattan_distance(node: Node) -> int:
+    def manhattan_distance(state, end) -> int:
         """Heuristic function for Greedy Best First Search
 
         Args:
@@ -15,10 +15,8 @@ class GreedyBestFirstSearch:
         Returns:
             int: Heuristic value
         """
-        if node.parent is None:
-            return 0
         
-        return abs(node.state[0] - node.parent.state[0]) + abs(node.state[1] - node.parent.state[1])
+        return abs(state[0] - end[0]) + abs(state[1] - end[1])
     
     @staticmethod
     def search(grid: Grid) -> Solution:
@@ -40,7 +38,7 @@ class GreedyBestFirstSearch:
         explored[node.state] = node.cost
         
         frontier = PriorityQueueFrontier()
-        frontier.add(node, GreedyBestFirstSearch.manhattan_distance(node))
+        frontier.add(node, GreedyBestFirstSearch.manhattan_distance(node.state, grid.end))
 
         while True:
 
@@ -66,4 +64,4 @@ class GreedyBestFirstSearch:
                                     action)
                     
                     explored[new_state] = cost
-                    frontier.add(new_node, GreedyBestFirstSearch.manhattan_distance(new_node))
+                    frontier.add(new_node, GreedyBestFirstSearch.manhattan_distance(new_node.state, grid.end))

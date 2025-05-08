@@ -6,7 +6,7 @@ from ..models.node import Node
 
 class AStarSearch:
     @staticmethod
-    def manhattan_distance(node: Node) -> int:
+    def manhattan_distance(state, end) -> int:
         """Heuristic function for A* Search
 
         Args:
@@ -15,10 +15,7 @@ class AStarSearch:
         Returns:
             int: Heuristic value
         """
-        if node.parent is None:
-            return 0
-        
-        return abs(node.state[0] - node.parent.state[0]) + abs(node.state[1] - node.parent.state[1])
+        return abs(state[0] - end[0]) + abs(state[1] - end[1])
     
     @staticmethod
     def search(grid: Grid) -> Solution:
@@ -40,7 +37,7 @@ class AStarSearch:
         explored[node.state] = node.cost
         
         frontier = PriorityQueueFrontier()
-        frontier.add(node, node.cost + AStarSearch.manhattan_distance(node))
+        frontier.add(node, node.cost + AStarSearch.manhattan_distance(node.state, grid.end))
 
         while True:
 
@@ -66,4 +63,4 @@ class AStarSearch:
                                     action)
                     
                     explored[new_state] = cost
-                    frontier.add(new_node, new_node.cost + AStarSearch.manhattan_distance(new_node))
+                    frontier.add(new_node, new_node.cost + AStarSearch.manhattan_distance(new_node.state, grid.end))

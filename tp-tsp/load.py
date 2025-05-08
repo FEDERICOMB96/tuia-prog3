@@ -1,6 +1,6 @@
 """Este modulo se encarga de la lectura de archivos ".tsp".
 
-Requiere del paquete tsplib95.
+Requiere del paquete tsplib95.sd
 """
 
 from __future__ import annotations

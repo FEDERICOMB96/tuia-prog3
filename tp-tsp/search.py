@@ -132,4 +132,35 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
 
-    # COMPLETAR
+    def __init__(self):
+        super().__init__()
+
+    def solve(self, problem: OptProblem):
+        actual = problem.init 
+        mejor = actual
+        tabu = []
+
+        iteraciones = 0
+        while True:
+            iteraciones += 1
+            if iteraciones > 100: # se cumple el criterio de parada 
+                break
+
+#Criterio de parada
+#1. Tras cierto número de iteraciones totales (o tiempo de CPU).
+#2. Tras cierto número de iteraciones sin mejoras en el mejor valor objetivo.
+#3. Cuando la función objetivo sobrepasa cierto valor umbral.'''
+
+            action = problem.max_action(actual)
+            sucesor = problem.result(actual, action)
+            if problem.obj_val(mejor) < problem.obj_val(sucesor):
+                mejor = sucesor
+
+            #actualizar tabu
+            tabu.append(actual) #guarda estados (son recorridos tambien)
+            if len(tabu) > 10: #probar asi o con mas, no se si esta bien
+                tabu.pop(0)
+
+            actual = sucesor
+        
+        return mejor

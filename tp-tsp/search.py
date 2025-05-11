@@ -82,36 +82,29 @@ class HillClimbing(LocalSearch):
 class HillClimbingReset(LocalSearch):
     """Algoritmo de ascension de colinas con reinicio aleatorio."""
 
-    def __init__(self):
-        super().__init__()
-        # A partir de 30 iteraciones, el algoritmo da el mismo resultado (-86585)
-        # Con menos iteraciones, el resultado algunas veces da otros valores
-        self.cantInteraciones = 30
+    # A partir de 30 iteraciones, el algoritmo da el mismo resultado (-86585)
+    # Con menos iteraciones, el resultado algunas veces da otros valores.
+    def __init__(self, cantInteraciones: int = 30):
+        super().__init__()    
+        self.cantInteraciones = cantInteraciones
 
     def solve(self, problem: OptProblem):
         # Inicio del reloj
         start = time()
         
-        # Arrancamos del estado inicial
-        actual = problem.init # es un recorrido
+        actual = problem.init
         value = problem.obj_val(problem.init)
 
         mejorRecorrido = actual
         mejorValor = value 
 
-        # ejecutamos unas X veces el algoritmo hillClimbing
         for _ in range(self.cantInteraciones):
-            # ejecutamos hillclimbing
             while True:
-                # Buscamos la acción que genera el sucesor con mayor valor objetivo
                 act, succ_val = problem.max_action(actual)
                 
-                # Retornar si estamos en un maximo local:
-                # el valor objetivo del sucesor es menor o igual al del estado actual
                 if succ_val <= value:
                     break
             
-                # Sino, nos movemos al sucesor
                 actual = problem.result(actual, act)
                 value = succ_val
                 self.niters += 1
@@ -129,41 +122,49 @@ class HillClimbingReset(LocalSearch):
         self.time = end-start
 
 
-
-
-
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
 
-    def __init__(self):
+    def __init__(self, cantInteraciones: int = 100, cantTabu: int = 10):
         super().__init__()
+        self.cantInteraciones = cantInteraciones
+        self.cantTabu = cantTabu
 
     def solve(self, problem: OptProblem):
-        actual = problem.init 
-        mejor = actual
-        tabu = []
+        start = time()
 
-        iteraciones = 0
-        while True:
-            iteraciones += 1
-            if iteraciones > 100: # se cumple el criterio de parada 
-                break
+        current = problem.init
+        current_value = problem.obj_val(current)
+        best = current
+        best_value = current_value
 
-#Criterio de parada
-#1. Tras cierto número de iteraciones totales (o tiempo de CPU).
-#2. Tras cierto número de iteraciones sin mejoras en el mejor valor objetivo.
-#3. Cuando la función objetivo sobrepasa cierto valor umbral.'''
+        tabu_list = []
 
-            action = problem.max_action(actual)
-            sucesor = problem.result(actual, action)
-            if problem.obj_val(mejor) < problem.obj_val(sucesor):
-                mejor = sucesor
+        self.niters = 0
 
-            #actualizar tabu
-            tabu.append(actual) #guarda estados (son recorridos tambien)
-            if len(tabu) > 10: #probar asi o con mas, no se si esta bien
-                tabu.pop(0)
+        while self.niters < self.cantInteraciones:
+            act, succ_val = problem.max_action(current)
 
-            actual = sucesor
-        
-        return mejor
+            successor = problem.result(current, act)
+
+            if successor not in tabu_list:
+                current = successor
+                current_value = succ_val
+                self.niters += 1
+
+                if current_value > best_value:
+                    best = current
+                    best_value = current_value
+
+                tabu_list.append(current)
+                
+                if len(tabu_list) > self.cantTabu:
+                    tabu_list.pop(0)
+            else:
+                self.niters += 1
+                continue
+
+        self.tour = best
+        self.value = best_value
+        end = time()
+        self.time = end - start

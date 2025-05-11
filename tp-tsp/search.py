@@ -84,6 +84,8 @@ class HillClimbingReset(LocalSearch):
 
     def __init__(self):
         super().__init__()
+        # A partir de 30 iteraciones, el algoritmo da el mismo resultado (-86585)
+        # Con menos iteraciones, el resultado algunas veces da otros valores
         self.cantInteraciones = 30
 
     def solve(self, problem: OptProblem):
@@ -97,8 +99,8 @@ class HillClimbingReset(LocalSearch):
         mejorRecorrido = actual
         mejorValor = value 
 
-        # ejecutamos una 100 veces el algoritmo hillClimbing
-        for i in range(10):
+        # ejecutamos unas X veces el algoritmo hillClimbing
+        for _ in range(self.cantInteraciones):
             # ejecutamos hillclimbing
             while True:
                 # Buscamos la acción que genera el sucesor con mayor valor objetivo
@@ -113,12 +115,13 @@ class HillClimbingReset(LocalSearch):
                 actual = problem.result(actual, act)
                 value = succ_val
                 self.niters += 1
-                print(self.niters)
             
             if mejorValor < value:
                 mejorValor = value
                 mejorRecorrido = actual
-
+            else:
+                actual = problem.random_reset()
+                value = problem.obj_val(actual)
 
         self.tour = mejorRecorrido
         self.value = mejorValor

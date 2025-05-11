@@ -161,7 +161,7 @@ class TSP(OptProblem):
             value -= self.G.get_edge_data(u, v)['weight']
         return value
 
-    def max_action(self, state: list[int]) -> tuple[tuple[int, int], float]:
+    def max_action(self, state: list[int], tabu: list = None) -> tuple[tuple[int, int], float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
         
         Se encuentra optimizada y por razones de eficiencia no se generan los sucesores y 
@@ -183,6 +183,9 @@ class TSP(OptProblem):
         max_act = None
         max_val = float("-inf")
         for a in self.actions(state):
+            #Si la lista es none y la accion no esta en la lista tabu, que continue
+            if tabu is not None and a in tabu: 
+                continue
             i, j = a
             v1 = state[i]+1  # origen de i
             v2 = state[i+1]+1  # destino de i
@@ -197,6 +200,8 @@ class TSP(OptProblem):
                 max_act = a
                 max_val = succ_value
         return max_act, max_val
+    
+
 
     def random_reset(self) -> list[int]:
         """Devuelve un estado del TSP con un tour aleatorio.

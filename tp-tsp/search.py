@@ -125,7 +125,7 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de busqueda tabu."""
 
-    def __init__(self, cantInteraciones: int = 20, cantTabu: int = 50):
+    def __init__(self, cantInteraciones: int = 2000, cantTabu: int = 20):
         super().__init__()
         self.cantInteraciones = cantInteraciones
         self.cantTabu = cantTabu
@@ -134,35 +134,36 @@ class Tabu(LocalSearch):
         start = time()
 
         current = problem.init
-        current_value = problem.obj_val(current)
+
         best = current
-        best_value = current_value
+        best_value = problem.obj_val(current)
 
         tabu_list = []
 
         self.niters = 0
+        no_mejora = 0
 
-        while self.niters < self.cantInteraciones:
+        while no_mejora < self.cantInteraciones:
             act, succ_val = problem.max_action(current, tabu_list)
 
             successor = problem.result(current, act)
 
-            if successor not in tabu_list:
-                current = successor
-                current_value = succ_val
-                self.niters += 1
+            self.niters += 1
 
-                if current_value > best_value:
-                    best = current
-                    best_value = current_value
+            if succ_val > best_value:
+                best = successor
+                best_value = succ_val
 
-                tabu_list.append(current)
-                
-                if len(tabu_list) > self.cantTabu:
-                    tabu_list.pop(0)
+                no_mejora = 0
             else:
-                self.niters += 1
-                continue
+                no_mejora += 1
+
+            tabu_list.append(act)
+            
+            if len(tabu_list) > self.cantTabu:
+                tabu_list.pop(0)
+            
+            current = successor
 
         self.tour = best
         self.value = best_value

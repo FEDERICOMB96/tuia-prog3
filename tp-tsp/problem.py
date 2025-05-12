@@ -64,7 +64,7 @@ class OptProblem:
         """Determina el valor objetivo de un estado."""
         raise NotImplementedError
 
-    def max_action(self, state: State) -> tuple[Action, float]:
+    def max_action(self, state: State, tabu: list[State] = None) -> tuple[Action, float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
 
         La idea es que este metodo este optimizado y sea mas eficiente que generar cada
@@ -161,7 +161,7 @@ class TSP(OptProblem):
             value -= self.G.get_edge_data(u, v)['weight']
         return value
 
-    def max_action(self, state: list[int], tabu: list = None) -> tuple[tuple[int, int], float]:
+    def max_action(self, state: list[int], tabu: list[tuple[int,int]] = None) -> tuple[tuple[int, int], float]:
         """Determina la accion que genera el sucesor con mayor valor objetivo para un estado dado.
         
         Se encuentra optimizada y por razones de eficiencia no se generan los sucesores y 

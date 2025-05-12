@@ -183,14 +183,13 @@ class TSP(OptProblem):
         max_act = None
         max_val = float("-inf")
         for a in self.actions(state):
-            #Si la lista es none y la accion no esta en la lista tabu, que continue
             if tabu is not None and a in tabu: 
                 continue
             i, j = a
-            v1 = state[i]+1  # origen de i
-            v2 = state[i+1]+1  # destino de i
-            v3 = state[j]+1  # origen de j
-            v4 = state[j+1]+1  # destino de j
+            v1 = state[i]+1  
+            v2 = state[i+1]+1 
+            v3 = state[j]+1
+            v4 = state[j+1]+1
             distl1l2 = self.G.get_edge_data(v1, v2)['weight']
             distl3l4 = self.G.get_edge_data(v3, v4)['weight']
             distl1l3 = self.G.get_edge_data(v1, v3)['weight']
